@@ -3,272 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>代码分享平台 | 作者：赵一诚</title>
+    <title>代码分享平台 | 赵一诚</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        body {
-            background: #f5f7fa;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .author {
-            color: #666;
-            margin-top: 8px;
-            font-size: 15px;
-        }
-        .box {
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 8px #0001;
-        }
-        input, select, textarea {
-            padding: 9px 12px;
-            margin: 6px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        button {
-            padding: 9px 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 4px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .editor {
-            background: #1e1e1e;
-            color: white;
-            padding: 18px;
-            border-radius: 10px;
-        }
-        textarea {
-            width: 100%;
-            height: 220px;
-            background: #252525;
-            color: #fff;
-            border: none;
-            font-family: Consolas, monospace;
-            resize: none;
-        }
-        .code-item {
-            background: white;
-            padding: 16px;
-            border-radius: 10px;
-            margin: 12px 0;
-            border-left: 4px solid #007bff;
-        }
-        pre {
-            background: #222;
-            color: #fff;
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
-        .output {
-            background: #111;
-            color: #0f0;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-family: Consolas;
-        }
-        .comment {
-            background: #f3f3f3;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin: 6px 0;
-        }
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #888;
-            font-size: 13px;
-        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI, sans-serif}
+        :root{--bg:#f8f9fa;--card:#fff;--text:#222;--gray:#666;--border:#ddd;--primary:#1677ff;--danger:#dc3545;--success:#07b156;--code:#1e1e1e}
+        .dark{--bg:#121212;--card:#1e1e1e;--text:#eee;--gray:#aaa;--border:#333;--code:#111}
+        body{background:var(--bg);color:var(--text);transition:.3s}
+        .nav{position:sticky;top:0;z-index:999;background:var(--card);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+        .nav-left{display:flex;gap:20px}
+        .nav-btn{background:none;border:none;color:var(--text);cursor:pointer;font-size:15px}
+        .nav-btn:hover{color:var(--primary)}
+        .nav-right{display:flex;gap:10px;align-items:center}
+        button{padding:7px 14px;border-radius:6px;border:none;background:var(--primary);color:#fff;cursor:pointer}
+        .danger{background:var(--danger)}
+        .success{background:var(--success)}
+        .container{max-width:1100px;margin:30px auto;padding:0 20px}
+        .mask{display:none;position:fixed;inset:0;background:#00000080;z-index:1000;justify-content:center;align-items:center}
+        .login-box{background:var(--card);padding:30px;border-radius:10px;width:360px}
+        input{width:100%;padding:10px;margin:8px 0;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)}
+        .editor{background:var(--code);color:#fff;padding:20px;border-radius:10px;margin-bottom:20px}
+        textarea{width:100%;height:240px;background:#252525;color:#fff;border:none;padding:12px;font-family:Consolas;border-radius:6px;resize:none}
+        .output{background:#111;color:#0f0;padding:12px;border-radius:6px;margin-top:10px}
+        .work{background:var(--card);padding:18px;border-radius:10px;margin-bottom:14px;border-left:4px solid var(--primary)}
+        pre{background:#222;color:#fff;padding:12px;border-radius:6px;overflow-x:auto;margin:10px 0}
+        .comment{background:var(--bg);padding:8px;border-radius:6px;margin:6px 0}
+        .bar{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+        .page{display:none}
+        .active-page{display:block}
+        .tip{color:var(--gray);margin:6px 0}
+        footer{text-align:center;padding:20px;color:var(--gray);margin-top:40px}
+        .admin-tag{color:var(--danger);font-weight:bold}
+        .pin{border-left:4px solid var(--danger)}
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 代码分享平台</h1>
-            <p>在线编写、运行、分享 Python / C++ / Scratch 代码</p>
-            <div class="author">作者：赵一诚</div>
-        </div>
 
-        <!-- 登录 -->
-        <div class="box">
-            <h3>用户登录</h3>
-            <input type="text" id="user" placeholder="用户名">
-            <input type="password" id="pwd" placeholder="密码">
-            <button onclick="login()">登录</button>
-            <button onclick="register()">注册</button>
-            <p id="tip" style="margin-top:8px"></p>
-        </div>
+<div class="nav">
+    <div class="nav-left">
+        <button class="nav-btn" onclick="show('home')">首页</button>
+        <button class="nav-btn" onclick="show('editor')">代码编辑器</button>
+        <button class="nav-btn" onclick="show('works')">作品广场</button>
+    </div>
+    <div class="nav-right">
+        <button onclick="toggleDark()">🌙</button>
+        <button id="loginStatus" onclick="openLogin()">登录</button>
+    </div>
+</div>
 
-        <!-- 编辑器 -->
-        <div class="editor">
-            <h3>✍️ 在线代码编辑器</h3>
-            <select id="lang">
-                <option value="python">Python</option>
-                <option value="cpp">C++</option>
-                <option value="scratch">Scratch</option>
-            </select>
-            <textarea id="code" placeholder="在这里写代码..."></textarea>
-            <br>
-            <button onclick="saveCode()">💾 保存到电脑</button>
-            <button onclick="uploadCode()">📤 上传作品</button>
-            <button onclick="runCode()">▶️ 运行代码</button>
-            <div class="output" id="output">运行结果：</div>
-        </div>
+<div class="mask" id="loginModal">
+    <div class="login-box">
+        <h3>登录 / 注册</h3>
+        <input id="user" placeholder="用户名">
+        <input id="pwd" type="password" placeholder="密码">
+        <input id="invite" placeholder="邀请码（选填，开发者专用）">
+        <p class="tip" id="loginMsg"></p>
+        <button onclick="userLogin()">确认登录</button>
+    </div>
+</div>
 
-        <!-- 上传 -->
-        <div class="box">
-            <h3>📌 作品信息</h3>
-            <input type="text" id="title" placeholder="作品标题">
-        </div>
-
-        <!-- 展示区 -->
-        <h3>📂 全部作品</h3>
-        <div id="show"></div>
-
-        <footer>© 2026 代码分享平台 | 作者：赵一诚</footer>
+<div class="container">
+    <div id="home" class="page active-page">
+        <h1>代码分享平台</h1><br>
+        <p>支持 Python / C++ / Scratch 在线编写、运行、分享</p><br>
+        <p>作者：赵一诚</p>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pyodide@0.26.0/dist/pyodide.js"></script>
-    <script>
-        let user = localStorage.getItem("username") || "";
-        let py = null;
-        let cppReady = false;
+    <div id="editor" class="page">
+        <h2>代码编辑器</h2><br>
+        <select id="lang" disabled>
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+            <option value="scratch">Scratch</option>
+        </select>
+        <textarea id="code" disabled placeholder="请先登录"></textarea>
+        <div class="bar">
+            <button id="btnRun" disabled>运行代码</button>
+            <button id="btnSave" disabled>保存到电脑</button>
+            <button id="btnUpload" disabled>上传作品</button>
+        </div>
+        <div class="output" id="output"></div>
+        <input id="title" disabled placeholder="作品标题" style="margin-top:10px">
+    </div>
 
-        // 登录注册
-        function login() {
-            let u = document.getElementById("user").value;
-            let p = document.getElementById("pwd").value;
-            if (u && p) { user = u; localStorage.setItem("username", u); document.getElementById("tip").innerText = "欢迎：" + u; }
-            else document.getElementById("tip").innerText = "请输入账号密码";
-        }
-        function register() {
-            let u = document.getElementById("user").value;
-            let p = document.getElementById("pwd").value;
-            if (u && p) { user = u; localStorage.setItem("username", u); document.getElementById("tip").innerText = "注册成功！" + u; }
-            else document.getElementById("tip").innerText = "请输入账号密码";
-        }
+    <div id="works" class="page">
+        <h2>作品广场</h2><br>
+        <div id="workList"></div>
+    </div>
+</div>
 
-        // 保存代码
-        function saveCode() {
-            let c = document.getElementById("code").value;
-            let l = document.getElementById("lang").value;
-            let ext = l == "python" ? "py" : l == "cpp" ? "cpp" : "txt";
-            let blob = new Blob([c], { type: "text/plain" });
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = "code." + ext;
-            a.click();
-        }
+<footer>© 2026 代码分享平台 | 作者：赵一诚</footer>
 
-        // 上传作品
-        function uploadCode() {
-            let title = document.getElementById("title").value;
-            let code = document.getElementById("code").value;
-            let lang = document.getElementById("lang").value;
-            if (!title || !code) return alert("请填写标题和代码");
-            let id = "w" + Date.now();
-            let item = `
-            <div class="code-item" id="${id}">
-                <h4>${title} (${lang})</h4>
-                <p>作者：${user || "匿名"}</p>
-                <pre><code class="language-${lang}">${esc(code)}</code></pre>
-                <input class="com-in" placeholder="写评论..." style="width:80%">
-                <button onclick="addComment('${id}')">发表</button>
-                <div id="c_${id}" style="margin-top:10px"></div>
-            </div>`;
-            document.getElementById("show").innerHTML += item;
-            setTimeout(() => hljs.highlightAll(), 50);
-            alert("上传成功！");
-        }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pyodide@0.26.0/dist/pyodide.js"></script>
+<script>
+let currentUser = null;
+let isAdmin = false;
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+let works = JSON.parse(localStorage.getItem("works") || "[]");
 
-        // 评论
-        function addComment(id) {
-            let txt = document.querySelector(`#${id} .com-in`).value;
-            if (!txt) return;
-            document.getElementById("c_" + id).innerHTML += `<div class="comment">${user || "匿名"}：${txt}</div>`;
-            document.querySelector(`#${id} .com-in`).value = "";
-        }
+function $(id){return document.getElementById(id)}
+function show(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));$(id).classList.add("active-page")}
 
-        // 转义HTML
-        function esc(s) {
-            return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
+function toggleDark(){document.body.classList.toggle("dark")}
+function openLogin(){$("loginModal").style.display="flex"}
+function closeLogin(){$("loginModal").style.display="none"}
 
-        // 运行代码
-        async function runCode() {
-            let code = document.getElementById("code").value;
-            let lang = document.getElementById("lang").value;
-            let out = document.getElementById("output");
-            out.innerText = "运行中...";
-
-            if (lang === "python") {
-                if (!py) py = await loadPyodide();
-                try {
-                    py.runPython("import sys\nsys.stdout = open('/tmp/out','w')");
-                    py.runPython(code);
-                    let res = py.runPython("open('/tmp/out').read()");
-                    out.innerText = res || "运行完成（无输出）";
-                } catch (e) {
-                    out.innerText = "错误：" + e.message;
-                }
-            }
-            else if (lang === "cpp") {
-                try {
-                    let res = await runCpp(code);
-                    out.innerText = res;
-                } catch (e) {
-                    out.innerText = "错误：" + e;
-                }
-            }
-            else {
-                out.innerText = "仅支持运行 Python / C++";
-            }
+function userLogin(){
+    let u = $("user").value.trim();
+    let p = $("pwd").value.trim();
+    let i = $("invite").value.trim();
+    if(!u||!p){$("loginMsg").innerText="请输入用户名和密码";return}
+    
+    let exist = users.find(x=>x.user===u);
+    if(exist){
+        if(exist.pwd!==p){$("loginMsg").innerText="密码错误";return}
+        currentUser=u;
+        isAdmin=exist.admin;
+    }else{
+        let admin=false;
+        if(i){
+            const SECURE_HASH = "79d884cc429b81f37f5ebd986358550d";
+            let hash = btoa(i.split("").reverse().join(""));
+            if(hash!==SECURE_HASH){$("loginMsg").innerText="邀请码错误";return}
+            admin=true;
         }
+        users.push({user:u,pwd:p,admin:admin});
+        localStorage.setItem("users",JSON.stringify(users));
+        currentUser=u;
+        isAdmin=admin;
+    }
+    localStorage.setItem("currentUser",currentUser);
+    localStorage.setItem("isAdmin",isAdmin);
+    afterLogin();
+}
 
-        // C++ 在线运行核心
-        async function runCpp(code) {
-            if (!cppReady) {
-                window.WASM_BINARY_BASE_URL = "https://cdn.jsdelivr.net/npm/wasm-clang@1.0.0/bin/";
-                await import("https://cdn.jsdelivr.net/npm/wasm-clang@1.0.0/dist/clang.js");
-                cppReady = true;
-            }
-            return new Promise((res, rej) => {
-                window.Clang().then(engine => {
-                    engine.writeFile("/main.cpp", code);
-                    engine.exec(`clang++ -o main main.cpp && ./main`, (out) => {
-                        res(out);
-                    });
-                });
-            });
-        }
-    </script>
+function afterLogin(){
+    closeLogin();
+    $("loginStatus").innerText=currentUser+(isAdmin?"(管理员)":"");
+    $("lang").disabled=false;
+    $("code").disabled=false;
+    $("title").disabled=false;
+    $("btnRun").disabled=false;
+    $("btnSave").disabled=false;
+    $("btnUpload").disabled=false;
+    renderWorks();
+}
+
+window.onload=()=>{
+    currentUser=localStorage.getItem("currentUser");
+    isAdmin=localStorage.getItem("isAdmin")==="true";
+    if(currentUser)afterLogin();
+    renderWorks();
+}
+
+async function runCode(){
+    let code=$("code").value;
+    let lang=$("lang").value;
+    let out=$("output");
+    out.innerText="运行中...";
+    if(lang==="python"){
+        let py=await loadPyodide();
+        try{
+            py.runPython("import sys\nsys.stdout=open('/tmp/out','w')");
+            py.runPython(code);
+            out.innerText=py.runPython("open('/tmp/out').read()");
+        }catch(e){out.innerText="错误："+e.message}
+    }else if(lang==="cpp"){
+        out.innerText="C++ 运行需要网络环境，首次加载稍慢...";
+        try{
+            let res=await (await fetch("https://run-api.com/run/cpp",{method:"POST",body:code})).text();
+            out.innerText=res;
+        }catch{e){out.innerText="运行失败"}
+    }else{out.innerText="仅支持Python/C++"}
+}
+
+function saveCode(){
+    let c=$("code").value,l=$("lang").value;
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([c]));
+    a.download="code."+(l==="python"?"py":l==="cpp"?"cpp":"txt");
+    a.click();
+}
+
+function uploadWork(){
+    if(!currentUser)return alert("请登录");
+    let t=$("title").value,c=$("code").value,l=$("lang").value;
+    if(!t||!c)return alert("请填写标题和代码");
+    works.unshift({id:Date.now(),title:t,code:c,lang:l,user:currentUser,pin:false,like:0});
+    localStorage.setItem("works",JSON.stringify(works));
+    renderWorks();
+    alert("上传成功");
+}
+
+function renderWorks(){
+    let list=$("workList");list.innerHTML="";
+    let pins=works.filter(w=>w.pin);
+    let norm=works.filter(w=>!w.pin);
+    [...pins,...norm].forEach(w=>{
+        let div=document.createElement("div");
+        div.className="work"+(w.pin?" pin":"");
+        div.innerHTML=`
+            <h4>${w.title} (${w.lang})</h4>
+            <p>作者：${w.user} ${w.pin?"<span class='admin-tag'>[首页]</span>":""}</p>
+            <pre><code class='language-${w.lang}'>${w.code.replace(/</g,"&lt;")}</code></pre>
+            <div class='bar'>
+                <button onclick='like(${w.id})'>❤️ ${w.like}</button>
+                ${w.user===currentUser||isAdmin?`<button class='danger' onclick='del(${w.id})'>删除</button>`:""}
+                ${isAdmin?`<button class='success' onclick='pin(${w.id})'>${w.pin?"取消首页":"推上首页"}</button>`:""}
+            </div>
+            <input placeholder='评论' style='width:70%' id='c${w.id}'>
+            <button onclick='comment(${w.id})'>发送</button>
+            <div id='clist${w.id}'></div>
+        `;
+        list.appendChild(div);
+    });
+    hljs.highlightAll();
+}
+
+function like(id){let w=works.find(x=>x.id===id);w.like++;localStorage.setItem("works",JSON.stringify(works));renderWorks()}
+function del(id){if(!confirm("确定删除？"))return;works=works.filter(x=>x.id!==id);localStorage.setItem("works",JSON.stringify(works));renderWorks()}
+function pin(id){let w=works.find(x=>x.id===id);w.pin=!w.pin;localStorage.setItem("works",JSON.stringify(works));renderWorks()}
+function comment(id){let t=$("c"+id).value;if(!t)return;let c=document.getElementById("clist"+id);c.innerHTML+=`<div class='comment'>${currentUser}：${t}</div>`;$("c"+id).value=""}
+
+$("btnRun").onclick=runCode;
+$("btnSave").onclick=saveCode;
+$("btnUpload").onclick=uploadWork;
+</script>
 </body>
 </html>
