@@ -3,24 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的第一个网站</title>
+    <title>代码分享平台 | 作者：赵一诚</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
         body {
-            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .header {
             text-align: center;
-            margin-top: 100px;
-            background-color: #f0f8ff;
+            margin-bottom: 25px;
         }
-        h1 {
-            color: #2c3e50;
+        .author {
+            color: #666;
+            margin-top: 8px;
+            font-size: 15px;
         }
-        p {
-            color: #34495e;
+        .box {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px #0001;
+        }
+        input, select, textarea {
+            padding: 9px 12px;
+            margin: 6px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            padding: 9px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .editor {
+            background: #1e1e1e;
+            color: white;
+            padding: 18px;
+            border-radius: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 220px;
+            background: #252525;
+            color: #fff;
+            border: none;
+            font-family: Consolas, monospace;
+            resize: none;
+        }
+        .code-item {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin: 12px 0;
+            border-left: 4px solid #007bff;
+        }
+        pre {
+            background: #222;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .output {
+            background: #111;
+            color: #0f0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: Consolas;
+        }
+        .comment {
+            background: #f3f3f3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 6px 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #888;
+            font-size: 13px;
         }
     </style>
 </head>
+
 <body>
-    <h1>🎉 欢迎来到我的网站！</h1>
-    <p>这是我用 GitHub Pages 免费搭建的网站~</p>
+    <div class="container">
+        <div class="header">
+            <h1>📚 代码分享平台</h1>
+            <p>在线编写、运行、分享 Python / C++ / Scratch 代码</p>
+            <div class="author">作者：赵一诚</div>
+        </div>
+
+        <!-- 登录 -->
+        <div class="box">
+            <h3>用户登录</h3>
+            <input type="text" id="user" placeholder="用户名">
+            <input type="password" id="pwd" placeholder="密码">
+            <button onclick="login()">登录</button>
+            <button onclick="register()">注册</button>
+            <p id="tip" style="margin-top:8px"></p>
+        </div>
+
+        <!-- 编辑器 -->
+        <div class="editor">
+            <h3>✍️ 在线代码编辑器</h3>
+            <select id="lang">
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="scratch">Scratch</option>
+            </select>
+            <textarea id="code" placeholder="在这里写代码..."></textarea>
+            <br>
+            <button onclick="saveCode()">💾 保存到电脑</button>
+            <button onclick="uploadCode()">📤 上传作品</button>
+            <button onclick="runCode()">▶️ 运行代码</button>
+            <div class="output" id="output">运行结果：</div>
+        </div>
+
+        <!-- 上传 -->
+        <div class="box">
+            <h3>📌 作品信息</h3>
+            <input type="text" id="title" placeholder="作品标题">
+        </div>
+
+        <!-- 展示区 -->
+        <h3>📂 全部作品</h3>
+        <div id="show"></div>
+
+        <footer>© 2026 代码分享平台 | 作者：赵一诚</footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pyodide@0.26.0/dist/pyodide.js"></script>
+    <script>
+        let user = localStorage.getItem("username") || "";
+        let py = null;
+        let cppReady = false;
+
+        // 登录注册
+        function login() {
+            let u = document.getElementById("user").value;
+            let p = document.getElementById("pwd").value;
+            if (u && p) { user = u; localStorage.setItem("username", u); document.getElementById("tip").innerText = "欢迎：" + u; }
+            else document.getElementById("tip").innerText = "请输入账号密码";
+        }
+        function register() {
+            let u = document.getElementById("user").value;
+            let p = document.getElementById("pwd").value;
+            if (u && p) { user = u; localStorage.setItem("username", u); document.getElementById("tip").innerText = "注册成功！" + u; }
+            else document.getElementById("tip").innerText = "请输入账号密码";
+        }
+
+        // 保存代码
+        function saveCode() {
+            let c = document.getElementById("code").value;
+            let l = document.getElementById("lang").value;
+            let ext = l == "python" ? "py" : l == "cpp" ? "cpp" : "txt";
+            let blob = new Blob([c], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "code." + ext;
+            a.click();
+        }
+
+        // 上传作品
+        function uploadCode() {
+            let title = document.getElementById("title").value;
+            let code = document.getElementById("code").value;
+            let lang = document.getElementById("lang").value;
+            if (!title || !code) return alert("请填写标题和代码");
+            let id = "w" + Date.now();
+            let item = `
+            <div class="code-item" id="${id}">
+                <h4>${title} (${lang})</h4>
+                <p>作者：${user || "匿名"}</p>
+                <pre><code class="language-${lang}">${esc(code)}</code></pre>
+                <input class="com-in" placeholder="写评论..." style="width:80%">
+                <button onclick="addComment('${id}')">发表</button>
+                <div id="c_${id}" style="margin-top:10px"></div>
+            </div>`;
+            document.getElementById("show").innerHTML += item;
+            setTimeout(() => hljs.highlightAll(), 50);
+            alert("上传成功！");
+        }
+
+        // 评论
+        function addComment(id) {
+            let txt = document.querySelector(`#${id} .com-in`).value;
+            if (!txt) return;
+            document.getElementById("c_" + id).innerHTML += `<div class="comment">${user || "匿名"}：${txt}</div>`;
+            document.querySelector(`#${id} .com-in`).value = "";
+        }
+
+        // 转义HTML
+        function esc(s) {
+            return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // 运行代码
+        async function runCode() {
+            let code = document.getElementById("code").value;
+            let lang = document.getElementById("lang").value;
+            let out = document.getElementById("output");
+            out.innerText = "运行中...";
+
+            if (lang === "python") {
+                if (!py) py = await loadPyodide();
+                try {
+                    py.runPython("import sys\nsys.stdout = open('/tmp/out','w')");
+                    py.runPython(code);
+                    let res = py.runPython("open('/tmp/out').read()");
+                    out.innerText = res || "运行完成（无输出）";
+                } catch (e) {
+                    out.innerText = "错误：" + e.message;
+                }
+            }
+            else if (lang === "cpp") {
+                try {
+                    let res = await runCpp(code);
+                    out.innerText = res;
+                } catch (e) {
+                    out.innerText = "错误：" + e;
+                }
+            }
+            else {
+                out.innerText = "仅支持运行 Python / C++";
+            }
+        }
+
+        // C++ 在线运行核心
+        async function runCpp(code) {
+            if (!cppReady) {
+                window.WASM_BINARY_BASE_URL = "https://cdn.jsdelivr.net/npm/wasm-clang@1.0.0/bin/";
+                await import("https://cdn.jsdelivr.net/npm/wasm-clang@1.0.0/dist/clang.js");
+                cppReady = true;
+            }
+            return new Promise((res, rej) => {
+                window.Clang().then(engine => {
+                    engine.writeFile("/main.cpp", code);
+                    engine.exec(`clang++ -o main main.cpp && ./main`, (out) => {
+                        res(out);
+                    });
+                });
+            });
+        }
+    </script>
 </body>
 </html>
